@@ -5,7 +5,12 @@ import cors from "cors";
 
 // Criar aplicação Express
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "https://polarize-brown.vercel.app"],
+    methods: ["GET", "POST"],
+  })
+);
 
 // Criar servidor HTTP
 const httpServer = createServer(app);
@@ -13,7 +18,7 @@ const httpServer = createServer(app);
 // Configurar Socket.IO
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000, https://polarize-brown.vercel.app/",
+    origin: ["http://localhost:3000", "https://polarize-brown.vercel.app"],
     methods: ["GET", "POST"],
   },
 });
