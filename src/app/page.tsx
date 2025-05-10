@@ -54,6 +54,9 @@ export default function Home() {
       name,
       alignment,
     });
+
+    // Redirecionar para sala de espera
+    router.push("/waiting");
   };
 
   return (

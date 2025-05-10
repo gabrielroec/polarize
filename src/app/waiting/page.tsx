@@ -2,49 +2,55 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import socket from "../../lib/socket";
 import React from "react";
 
-export default function WaitingPage() {
-  const [dots, setDots] = useState("");
+export default function Waiting() {
+  const [isConnected, setIsConnected] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
-    }, 500);
+    // Verificar conexão
+    setIsConnected(socket.connected);
 
-    // Simulando um match após 5 segundos (apenas para teste)
-    const matchTimeout = setTimeout(() => {
+    // Evento de conexão
+    socket.on("connect", () => {
+      setIsConnected(true);
+    });
+
+    // Evento de desconexão
+    socket.on("disconnect", () => {
+      setIsConnected(false);
+    });
+
+    // Evento de match
+    socket.on("match", (data) => {
+      console.log("Match encontrado!", data);
+      localStorage.setItem("opponent", JSON.stringify(data.opponent));
       router.push("/debate");
-    }, 5000);
+    });
 
     return () => {
-      clearInterval(interval);
-      clearTimeout(matchTimeout);
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("match");
     };
   }, [router]);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md text-center">
-        <div className="mb-8">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <h1 className="text-3xl font-bold mb-8 text-gray-800">Aguardando Debate</h1>
+
+        {/* Indicador de conexão */}
+        <div className={`mb-4 ${isConnected ? "text-green-500" : "text-red-500"}`}>{isConnected ? "Conectado" : "Desconectado"}</div>
+
+        {/* Animação de loading */}
+        <div className="flex justify-center mb-8">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Procurando um debate{dots}</h2>
-
-        <p className="text-gray-600 mb-6">Aguarde enquanto encontramos alguém com visões políticas diferentes para debater</p>
-
-        <div className="space-y-4">
-          <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span>Conectado à rede</span>
-          </div>
-
-          <button onClick={() => router.push("/")} className="text-blue-600 hover:text-blue-800 font-medium">
-            Cancelar busca
-          </button>
-        </div>
+        <p className="text-gray-600">Procurando alguém com visão política oposta...</p>
       </div>
     </main>
   );
