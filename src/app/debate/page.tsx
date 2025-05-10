@@ -4,6 +4,13 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import React from "react";
 
+// Declaração de tipos para as APIs do navegador
+declare global {
+  interface Window {
+    MediaStream: typeof MediaStream;
+  }
+}
+
 export default function DebatePage() {
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
@@ -12,25 +19,39 @@ export default function DebatePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Aqui posteriormente adicionaremos a lógica de WebRTC
-    if (videoRef.current) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        })
-        .catch((err) => {
-          console.error("Erro ao acessar câmera/microfone:", err);
-        });
-    }
+    let localStream: MediaStream | null = null;
 
+    // Função para inicializar o fluxo de mídia
+    const initializeMedia = async () => {
+      // Verificar se estamos no navegador e se as APIs necessárias estão disponíveis
+      if (typeof window === "undefined" || !navigator?.mediaDevices?.getUserMedia) {
+        console.log("APIs de mídia não disponíveis");
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+
+        localStream = stream;
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (err) {
+        console.error("Erro ao acessar câmera/microfone:", err);
+      }
+    };
+
+    // Inicializar mídia
+    initializeMedia();
+
+    // Cleanup function
     return () => {
-      // Limpar streams ao sair
-      if (videoRef.current?.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach((track) => track.stop());
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
       }
     };
   }, []);

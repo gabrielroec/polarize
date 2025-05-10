@@ -26,7 +26,9 @@ export default function Waiting() {
     // Evento de match
     socket.on("match", (data) => {
       console.log("Match encontrado!", data);
-      localStorage.setItem("opponent", JSON.stringify(data.opponent));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("opponent", JSON.stringify(data.opponent));
+      }
       router.push("/debate");
     });
 

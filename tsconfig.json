@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es2017",
     "module": "commonjs",
-    "lib": ["es2017", "esnext.asynciterable"],
+    "lib": ["es2017", "esnext.asynciterable", "dom", "dom.iterable"],
     "skipLibCheck": true,
     "sourceMap": true,
     "outDir": "./dist",
@@ -21,8 +21,19 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "resolveJsonModule": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "allowJs": true,
+    "strict": false,
+    "noEmit": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "exclude": ["node_modules"],
-  "include": ["./server/**/*.ts"]
+  "include": ["./server/**/*.ts", ".next/types/**/*.ts", "./src/**/*.ts", "./src/**/*.tsx"]
 }

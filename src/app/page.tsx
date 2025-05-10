@@ -31,7 +31,9 @@ export default function Home() {
     socket.on("match", (data) => {
       console.log("Match encontrado!", data);
       // Armazenar informações do oponente
-      localStorage.setItem("opponent", JSON.stringify(data.opponent));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("opponent", JSON.stringify(data.opponent));
+      }
       router.push("/debate");
     });
 
@@ -81,7 +83,7 @@ export default function Home() {
               type="text"
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Digite seu nome"
               required
