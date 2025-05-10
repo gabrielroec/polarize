@@ -13,9 +13,8 @@ const httpServer = createServer(app);
 // Configurar Socket.IO
 const io = new Server(httpServer, {
   cors: {
-    origin: ["https://polarize-brown.vercel.app", "http://localhost:3000"],
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
-    credentials: true,
   },
 });
 
