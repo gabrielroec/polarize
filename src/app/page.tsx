@@ -1,28 +1,73 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import React from "react";
+import socket from "../lib/socket";
 
 export default function Home() {
   const [name, setName] = useState("");
   const [alignment, setAlignment] = useState<"left" | "right" | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [queueStatus, setQueueStatus] = useState<string>("");
   const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Monitorar conexão
+  useEffect(() => {
+    // Evento de conexão
+    socket.on("connect", () => {
+      console.log("Conectado ao servidor!");
+      setIsConnected(true);
+    });
+
+    // Evento de desconexão
+    socket.on("disconnect", () => {
+      console.log("Desconectado do servidor");
+      setIsConnected(false);
+    });
+
+    // Evento de match
+    socket.on("match", (data) => {
+      console.log("Match encontrado!", data);
+      // Armazenar informações do oponente
+      localStorage.setItem("opponent", JSON.stringify(data.opponent));
+      router.push("/debate");
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+      socket.off("match");
+    };
+  }, [router]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !alignment) return;
 
     setIsLoading(true);
-    // Aqui posteriormente adicionaremos a lógica de conexão com o backend
-    router.push("/waiting");
+    setQueueStatus("Entrando na fila...");
+
+    // Entrar na fila
+    socket.emit("joinQueue", {
+      name,
+      alignment,
+    });
   };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
         <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Polarize Debate</h1>
+
+        {/* Indicador de conexão */}
+        <div className={`mb-4 text-center ${isConnected ? "text-green-500" : "text-red-500"}`}>
+          {isConnected ? "Conectado" : "Desconectado"}
+        </div>
+
+        {/* Status da fila */}
+        {queueStatus && <div className="mb-4 text-center text-blue-600">{queueStatus}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
