@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc",
     "start": "next start",
     "lint": "next lint",
     "server": "ts-node --project tsconfig.json server/index.ts",
     "server:dev": "nodemon --exec ts-node --project tsconfig.json server/index.ts",
     "test-client": "ts-node server/test-client.ts",
-    "start:server": "node dist/server/index.js"
+    "start:server": "node dist/server/index.js",
+    "postinstall": "npm run build"
   },
   "dependencies": {
     "cors": "^2.8.5",

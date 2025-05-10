@@ -24,16 +24,11 @@
     "baseUrl": ".",
     "allowJs": true,
     "strict": false,
-    "noEmit": true,
+    "noEmit": false,
     "incremental": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "jsx": "preserve"
   },
-  "exclude": ["node_modules"],
-  "include": ["./server/**/*.ts", ".next/types/**/*.ts", "./src/**/*.ts", "./src/**/*.tsx"]
+  "include": ["server/**/*"],
+  "exclude": ["node_modules"]
 }
